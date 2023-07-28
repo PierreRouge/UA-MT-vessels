@@ -109,8 +109,9 @@ if __name__ == "__main__":
                            CenterCrop(patch_size),
                            ToTensor()
                        ]))
-    labeled_idxs = list(range(16))
-    unlabeled_idxs = list(range(16, 80))
+    
+    labeled_idxs = list(range(42))
+    unlabeled_idxs = list(range(42, 76))
     batch_sampler = TwoStreamBatchSampler(labeled_idxs, unlabeled_idxs, batch_size, batch_size-labeled_bs)
     def worker_init_fn(worker_id):
         random.seed(args.seed+worker_id)
@@ -196,7 +197,7 @@ if __name__ == "__main__":
             writer.add_scalar('train/consistency_dist', consistency_dist, iter_num)
 
             logging.info('iteration %d : loss : %f cons_dist: %f, loss_weight: %f' %
-                         (iter_num, loss.item(), consistency_dist.item(), consistency_weight))
+                          (iter_num, loss.item(), consistency_dist.item(), consistency_weight))
             if iter_num % 50 == 0:
                 image = volume_batch[0, 0:1, :, :, 20:61:10].permute(3, 0, 1, 2).repeat(1, 3, 1, 1)
                 grid_image = make_grid(image, 5, normalize=True)
