@@ -18,7 +18,7 @@ if not os.path.exists(test_save_path):
 
 num_classes = 2
 
-with open(FLAGS.root_path + '/../test.list', 'r') as f:
+with open(FLAGS.root_path + '/test.list', 'r') as f:
     image_list = f.readlines()
 image_list = [FLAGS.root_path +item.replace('\n', '')+"/mra_norm.h5" for item in image_list]
 
