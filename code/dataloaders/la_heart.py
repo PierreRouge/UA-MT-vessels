@@ -7,6 +7,10 @@ import h5py
 import itertools
 from torch.utils.data.sampler import Sampler
 
+from torchvision import transforms
+from torch.utils.data import DataLoader
+
+
 class LAHeart(Dataset):
     """ LA Dataset """
     def __init__(self, base_dir=None, split='train', num=None, transform=None):
@@ -204,3 +208,24 @@ def grouper(iterable, n):
     # grouper('ABCDEFG', 3) --> ABC DEF"
     args = [iter(iterable)] * n
     return zip(*args)
+
+if __name__ == '__main__':
+    
+    patch_size =(112, 112, 80)
+    dir_data = '../../data/2018LA_Seg_Training Set'
+    
+    db_train = LAHeart(base_dir=dir_data,
+                       split='train',
+                       transform = transforms.Compose([
+                          RandomRotFlip(),
+                          RandomCrop(patch_size),
+                          ToTensor(),
+                          ]))
+    
+    trainloader = DataLoader(db_train)
+    
+    for batch, data in enumerate(trainloader):
+        label = data['label']
+        print(label.shape)
+        print('Sum')
+        print(torch.sum(label))
