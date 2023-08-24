@@ -6,7 +6,7 @@ from medpy import metric
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
-
+from monai.inferers import sliding_window_inference
 
 def test_all_case(net, image_list, num_classes, patch_size=(112, 112, 80), stride_xy=18, stride_z=4, save_result=True, test_save_path=None, preproc_fn=None):
     total_metric = 0.0
@@ -20,6 +20,36 @@ def test_all_case(net, image_list, num_classes, patch_size=(112, 112, 80), strid
         if preproc_fn is not None:
             image = preproc_fn(image)
         prediction, score_map = test_single_case(net, image, stride_xy, stride_z, patch_size, num_classes=num_classes)
+
+        if np.sum(prediction)==0:
+            single_metric = (0,0,0,0)
+        else:
+            single_metric = calculate_metric_percase(prediction, label[:])
+        total_metric += np.asarray(single_metric)
+
+        if save_result:
+            nib.save(nib.Nifti1Image(prediction.astype(np.float32), np.eye(4)), test_save_path + id + "_pred.nii.gz")
+            nib.save(nib.Nifti1Image(image[:].astype(np.float32), np.eye(4)), test_save_path + id + "_img.nii.gz")
+            nib.save(nib.Nifti1Image(label[:].astype(np.float32), np.eye(4)), test_save_path + id + "_gt.nii.gz")
+    avg_metric = total_metric / len(image_list)
+    print('average metric is {}'.format(avg_metric))
+
+    return avg_metric
+
+def test_all_case_monai(net, image_list, num_classes, patch_size=(112, 112, 80), save_result=True, test_save_path=None, preproc_fn=None):
+    total_metric = 0.0
+    for image_path in tqdm(image_list):
+        id = image_path.split('/')[-2]
+        h5f = h5py.File(image_path, 'r')
+        image = h5f['image'][:]
+        label = h5f['label'][:]
+        print(label)
+        print(np.sum(label))
+        if preproc_fn is not None:
+            image = preproc_fn(image)
+        image = torch.from_numpy(image)
+        prediction_ = sliding_window_inference(inputs=image, roi_size=patch_size, sw_batch_size=2, predictor=net)
+        prediction = prediction_[0,0,:,:,:].numpy()
 
         if np.sum(prediction)==0:
             single_metric = (0,0,0,0)

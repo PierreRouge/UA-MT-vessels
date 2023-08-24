@@ -57,7 +57,7 @@ if args.deterministic:
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed(args.seed)
 
-num_classes = 2
+num_classes = 1
 patch_size = (128, 128, 128)
 
 

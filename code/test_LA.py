@@ -2,7 +2,7 @@ import os
 import argparse
 import torch
 from networks.vnet import VNet
-from test_util import test_all_case
+from test_util import test_all_case, test_all_case_monai
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root_path', type=str, default='../data/', help='Name of Experiment')
@@ -30,8 +30,8 @@ def test_calculate_metric(epoch_num):
     print("init weight from {}".format(save_mode_path))
     net.eval()
 
-    avg_metric = test_all_case(net, image_list, num_classes=num_classes,
-                               patch_size=(128, 128, 128), stride_xy=18, stride_z=4,
+    avg_metric = test_all_case_monai(net, image_list, num_classes=num_classes,
+                               patch_size=(128, 128, 128),
                                save_result=True, test_save_path=test_save_path)
 
     return avg_metric
