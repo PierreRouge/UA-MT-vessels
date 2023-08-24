@@ -152,13 +152,13 @@ if __name__ == "__main__":
             T = 8
             volume_batch_r = unlabeled_volume_batch.repeat(2, 1, 1, 1, 1)
             stride = volume_batch_r.shape[0] // 2
-            preds = torch.zeros([stride * T, 2, 112, 112, 80]).cuda()
+            preds = torch.zeros([stride * T, 2, 128, 128, 128]).cuda()
             for i in range(T//2):
                 ema_inputs = volume_batch_r + torch.clamp(torch.randn_like(volume_batch_r) * 0.1, -0.2, 0.2)
                 with torch.no_grad():
                     preds[2 * stride * i:2 * stride * (i + 1)] = ema_model(ema_inputs)
             preds = F.softmax(preds, dim=1)
-            preds = preds.reshape(T, stride, 2, 112, 112, 80)
+            preds = preds.reshape(T, stride, 2, 128, 128, 128)
             preds = torch.mean(preds, dim=0)  #(batch, 2, 112,112,80)
             uncertainty = -1.0*torch.sum(preds*torch.log(preds + 1e-6), dim=1, keepdim=True) #(batch, 1, 112,112,80)
 
