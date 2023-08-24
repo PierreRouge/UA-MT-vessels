@@ -166,6 +166,8 @@ if __name__ == "__main__":
 
 
             ## calculate the loss
+            print("Shape output")
+            print(outputs.shape)
             loss_seg = F.cross_entropy(outputs[:labeled_bs], label_batch[:labeled_bs])
             outputs_soft = F.softmax(outputs, dim=1)
             loss_seg_dice = losses.dice_loss(outputs_soft[:labeled_bs, 1, :, :, :], label_batch[:labeled_bs] == 1)
