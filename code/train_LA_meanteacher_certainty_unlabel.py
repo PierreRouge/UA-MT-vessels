@@ -143,6 +143,8 @@ if __name__ == "__main__":
             volume_batch, label_batch = sampled_batch['image'], sampled_batch['label']
             volume_batch, label_batch = volume_batch.cuda(), label_batch.cuda()
             unlabeled_volume_batch = volume_batch[labeled_bs:]
+            print("Shape label")
+            print(label_batch.shape)
 
             noise = torch.clamp(torch.randn_like(unlabeled_volume_batch) * 0.1, -0.2, 0.2)
             ema_inputs = unlabeled_volume_batch + noise
