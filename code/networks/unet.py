@@ -18,9 +18,9 @@ class Convolution(nn.Module):
         
         super().__init__()
         
-        conv = nn.Conv3d(in_channels=in_channels, out_channels=out_channels, stride=strides, kernel_size=kernel_size)
-        norm = nn.InstanceNorm3d(out_channels, affine=True)
-        act = nn.LeakyReLU(negative_slope=0.1, inplace=False)
+        self.conv = nn.Conv3d(in_channels=in_channels, out_channels=out_channels, stride=strides, kernel_size=kernel_size)
+        self.norm = nn.InstanceNorm3d(out_channels, affine=True)
+        self.act = nn.LeakyReLU(negative_slope=0.1, inplace=False)
         
     def forward(self, x):
         x = self.conv(x)
