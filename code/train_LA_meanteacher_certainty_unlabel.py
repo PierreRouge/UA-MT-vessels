@@ -24,7 +24,7 @@ from utils import ramps, losses
 from dataloaders.la_heart import LAHeart, RandomCrop, CenterCrop, RandomRotFlip, ToTensor, TwoStreamBatchSampler
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--root_path', type=str, default='../data/2018LA_Seg_Training Set/', help='Name of Experiment')
+parser.add_argument('--root_path', type=str, default='../data/2018LA_Seg_Training Set', help='Name of Experiment')
 parser.add_argument('--exp', type=str,  default='UAMT_unlabel', help='model_name')
 parser.add_argument('--max_iterations', type=int,  default=6000, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int, default=4, help='batch_size per gpu')
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         features = (32, 64, 128, 256)
         kernel_size = (3, 3, 3, 3)
         strides = (1, 2, 2, 2)
-        net = TinyUnet(dim=3, in_channel=1, features=features, strides=strides, kernel_size=kernel_size) #change to U-Net for fair comparaison
+        net = TinyUnet(dim=3, in_channel=1, features=features, strides=strides, kernel_size=kernel_size, nclasses=2) #change to U-Net for fair comparaison
         model = net.cuda()
         if ema:
             for param in model.parameters():

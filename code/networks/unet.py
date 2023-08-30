@@ -18,11 +18,12 @@ class Convolution(nn.Module):
         
         super().__init__()
         
-        self.conv = nn.Conv3d(in_channels=in_channels, out_channels=out_channels, stride=strides, kernel_size=kernel_size)
+        self.conv = nn.Conv3d(in_channels=in_channels, out_channels=out_channels, stride=strides, kernel_size=kernel_size, padding=1)
         self.norm = nn.InstanceNorm3d(out_channels, affine=True)
         self.act = nn.LeakyReLU(negative_slope=0.1, inplace=False)
         
     def forward(self, x):
+
         x = self.conv(x)
         x = self.norm(x)
         x = self.act(x)
@@ -34,7 +35,7 @@ class Convolution_trans(nn.Module):
         
         super().__init__()
         
-        self.conv = nn.ConvTranspose3d(in_channels=in_channels, out_channels=out_channels, stride=strides, kernel_size=kernel_size)
+        self.conv = nn.ConvTranspose3d(in_channels=in_channels, out_channels=out_channels, stride=strides, kernel_size=kernel_size, padding=1, output_padding=1)
         self.norm = nn.InstanceNorm3d(out_channels, affine=True)
         self.act = nn.LeakyReLU(negative_slope=0.1, inplace=False)
         
@@ -266,12 +267,12 @@ class Decoder_UNet(nn.Module):
 
 class TinyDecoder_UNet(nn.Module):
     
-    def __init__(self, dim, in_channel, features, strides, kernel_size):
+    def __init__(self, dim, in_channel, features, strides, kernel_size, nclasses):
         super(TinyDecoder_UNet, self).__init__()
         self.up_1 = Conv_Up_with_skip(dim, features[3], features[2], strides[3], kernel_size[3])
         self.up_2 = Conv_Up_with_skip(dim, features[2], features[1], strides[2], kernel_size[2])
         self.up_3 = Conv_Up_with_skip(dim, features[1], features[0], strides[1], kernel_size[1])
-        self.final_conv_1 = nn.Conv3d(features[0], 1, kernel_size=1)
+        self.final_conv_1 = nn.Conv3d(features[0], nclasses, kernel_size=1)
 
     def forward(self, x4: torch.Tensor, x1: torch.Tensor, x2: torch.Tensor, x3: torch.Tensor):
         x5 = self.up_1(x4, x3)
@@ -318,15 +319,15 @@ class TinyDiscriminator(nn.Module):
 
       
 class TinyUnet(nn.Module):
-    def __init__(self, dim, in_channel, features, strides, kernel_size):
+    def __init__(self, dim, in_channel, features, strides, kernel_size, nclasses):
         super(TinyUnet, self).__init__()
 
         self.shallowencoder = TinyShallowEncoder(dim, in_channel, features, strides, kernel_size)
         self.deepencoder = TinyDeepEncoder(dim, in_channel, features, strides, kernel_size)
-        self.decoder = TinyDecoder_UNet(dim, in_channel, features, strides, kernel_size)
+        self.decoder = TinyDecoder_UNet(dim, in_channel, features, strides, kernel_size, nclasses)
 
     def forward(self, x: torch.Tensor):
-
+        
         x2, x1 = self.shallowencoder(x)
         x4, x3 = self.deepencoder(x2)
         x_final = self.decoder(x4, x1, x2, x3)
