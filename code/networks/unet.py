@@ -18,7 +18,7 @@ class Convolution(nn.Module):
         
         super().__init__()
         
-        conv = nn.Conv3d(in_channels=in_channels, out_channels=out_channels, strides=strides, kernel_size=kernel_size)
+        conv = nn.Conv3d(in_channels=in_channels, out_channels=out_channels, stride=strides, kernel_size=kernel_size)
         norm = nn.InstanceNorm3d(out_channels, affine=True)
         act = nn.LeakyReLU(negative_slope=0.1, inplace=False)
         
