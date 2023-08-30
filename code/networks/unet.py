@@ -15,6 +15,9 @@ from torch import nn
 
 class Convolution(nn.Module):
     def __init__(self, in_channels, out_channels, strides, kernel_size):
+        
+        super().__init__()
+        
         conv = nn.Conv3d(in_channels=in_channels, out_channels=out_channels, strides=strides, kernel_size=kernel_size)
         norm = nn.InstanceNorm3d(out_channels, affine=True)
         act = nn.LeakyReLU(negative_slope=0.1, inplace=False)
@@ -34,7 +37,6 @@ class DoubleConv(nn.Sequential):
         super().__init__()
         
         conv1 = Convolution(
-            spatial_dims=dim,
             in_channels=in_features,
             out_channels=out_features,
             strides=strides,
@@ -43,7 +45,6 @@ class DoubleConv(nn.Sequential):
         )
         
         conv2 = Convolution(
-            spatial_dims=dim,
             in_channels=out_features,
             out_channels=out_features,
             strides=1,
@@ -60,7 +61,6 @@ class Conv_Up_with_skip(nn.Module):
         super().__init__()
         
         self.conv_trans = Convolution(
-            spatial_dims=dim,
             in_channels=in_features,
             out_channels=out_features,
             strides=strides,
@@ -69,7 +69,6 @@ class Conv_Up_with_skip(nn.Module):
         )
         
         self.conv1 = Convolution(
-            spatial_dims=dim,
             in_channels=out_features * 2,
             out_channels=out_features,
             strides=(1, 1, 1),
@@ -78,7 +77,6 @@ class Conv_Up_with_skip(nn.Module):
         )
         
         self.conv2 = Convolution(
-            spatial_dims=dim,
             in_channels=out_features,
             out_channels=out_features,
             strides=(1, 1, 1),
@@ -235,7 +233,7 @@ class Decoder_UNet(nn.Module):
         self.up_4 = Conv_Up_with_skip(dim, features[2], features[1], strides[2], kernel_size[2])
         self.up_5 = Conv_Up_with_skip(dim, features[1], features[0], strides[1], kernel_size[1])
         
-        self.final_conv_1 = Conv["conv", dim](features[0], 1, kernel_size=1)
+        self.final_conv_1 = nn.Conv3d(features[0], 1, kernel_size=1)
         
     def forward(self, x6: torch.Tensor, x1: torch.Tensor, x2: torch.Tensor, x3: torch.Tensor, x4: torch.Tensor, x5: torch.Tensor):
             
@@ -256,7 +254,7 @@ class TinyDecoder_UNet(nn.Module):
         self.up_1 = Conv_Up_with_skip(dim, features[3], features[2], strides[3], kernel_size[3])
         self.up_2 = Conv_Up_with_skip(dim, features[2], features[1], strides[2], kernel_size[2])
         self.up_3 = Conv_Up_with_skip(dim, features[1], features[0], strides[1], kernel_size[1])
-        self.final_conv_1 = Conv["conv", dim](features[0], 1, kernel_size=1)
+        self.final_conv_1 = nn.Conv3d(features[0], 1, kernel_size=1)
 
     def forward(self, x4: torch.Tensor, x1: torch.Tensor, x2: torch.Tensor, x3: torch.Tensor):
         x5 = self.up_1(x4, x3)
