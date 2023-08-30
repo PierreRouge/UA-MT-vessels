@@ -28,6 +28,23 @@ class Convolution(nn.Module):
         x = self.act(x)
         
         return x
+    
+class Convolution_trans(nn.Module):
+    def __init__(self, in_channels, out_channels, strides, kernel_size):
+        
+        super().__init__()
+        
+        self.conv = nn.ConvTranspose3d(in_channels=in_channels, out_channels=out_channels, stride=strides, kernel_size=kernel_size)
+        self.norm = nn.InstanceNorm3d(out_channels, affine=True)
+        self.act = nn.LeakyReLU(negative_slope=0.1, inplace=False)
+        
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.norm(x)
+        x = self.act(x)
+        
+        return x
+        
         
     
 
@@ -60,7 +77,7 @@ class Conv_Up_with_skip(nn.Module):
         
         super().__init__()
         
-        self.conv_trans = Convolution(
+        self.conv_trans = Convolution_trans(
             in_channels=in_features,
             out_channels=out_features,
             strides=strides,
@@ -257,8 +274,6 @@ class TinyDecoder_UNet(nn.Module):
         self.final_conv_1 = nn.Conv3d(features[0], 1, kernel_size=1)
 
     def forward(self, x4: torch.Tensor, x1: torch.Tensor, x2: torch.Tensor, x3: torch.Tensor):
-        print(x4.shape)
-        print(x3.shape)
         x5 = self.up_1(x4, x3)
         x6 = self.up_2(x5, x2)
         x7 = self.up_3(x6, x1)
