@@ -11,8 +11,6 @@ Re-implementation of U-Net
 import torch
 from torch import nn
 
-from monai.networks.layers.factories import Conv
-
 #%% Layers
 
 class Convolution(nn.Module):
