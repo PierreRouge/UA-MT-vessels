@@ -257,6 +257,8 @@ class TinyDecoder_UNet(nn.Module):
         self.final_conv_1 = nn.Conv3d(features[0], 1, kernel_size=1)
 
     def forward(self, x4: torch.Tensor, x1: torch.Tensor, x2: torch.Tensor, x3: torch.Tensor):
+        print(x4.shape)
+        print(x3.shape)
         x5 = self.up_1(x4, x3)
         x6 = self.up_2(x5, x2)
         x7 = self.up_3(x6, x1)
