@@ -27,7 +27,7 @@ def test_calculate_metric(epoch_num):
     features = (32, 64, 128, 256)
     kernel_size = (3, 3, 3, 3)
     strides = (1, 2, 2, 2)
-    net = TinyUnet(dim=3, in_channel=1, features=features, strides=strides, kernel_size=kernel_size, nclasses=2) #change to U-Net for fair comparaison
+    net = TinyUnet(dim=3, in_channel=1, features=features, strides=strides, kernel_size=kernel_size, nclasses=2).cuda() #change to U-Net for fair comparaison
     save_mode_path = os.path.join(snapshot_path, 'iter_' + str(epoch_num) + '.pth')
     net.load_state_dict(torch.load(save_mode_path))
     print("init weight from {}".format(save_mode_path))
