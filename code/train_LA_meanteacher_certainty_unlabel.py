@@ -35,7 +35,7 @@ parser.add_argument('--seed', type=int,  default=1337, help='random seed')
 parser.add_argument('--gpu', type=str,  default='0', help='GPU to use')
 ### costs
 parser.add_argument('--ema_decay', type=float,  default=0.99, help='ema_decay')
-parser.add_argument('--consistency_type', type=str,  default="mse", help='consistency_type')
+parser.add_argument('--consistency_type', type=str,  default="dice", help='consistency_type')
 parser.add_argument('--consistency', type=float,  default=0.1, help='consistency')
 parser.add_argument('--consistency_rampup', type=float,  default=40.0, help='consistency_rampup')
 args = parser.parse_args()
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     def create_model(ema=False):
         # Network definition
         # net = VNet(n_channels=1, n_classes=num_classes, normalization='batchnorm', has_dropout=True)
-        features = (32, 64, 128, 256)
+        features = (2, 2, 2, 2)
         kernel_size = (3, 3, 3, 3)
         strides = (1, 2, 2, 2)
         net = TinyUnet(dim=3, in_channel=1, features=features, strides=strides, kernel_size=kernel_size, nclasses=2) #change to U-Net for fair comparaison
@@ -130,6 +130,8 @@ if __name__ == "__main__":
         consistency_criterion = losses.softmax_mse_loss
     elif args.consistency_type == 'kl':
         consistency_criterion = losses.softmax_kl_loss
+    elif args.consistency_type == 'dice':
+        consistency_criterion = losses.softmax_dice_loss
     else:
         assert False, args.consistency_type
 
