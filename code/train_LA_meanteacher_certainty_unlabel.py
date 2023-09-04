@@ -88,7 +88,7 @@ if __name__ == "__main__":
     def create_model(ema=False):
         # Network definition
         # net = VNet(n_channels=1, n_classes=num_classes, normalization='batchnorm', has_dropout=True)
-        features = (2, 2, 2, 2)
+        features = (32, 64, 128, 256)
         kernel_size = (3, 3, 3, 3)
         strides = (1, 2, 2, 2)
         net = TinyUnet(dim=3, in_channel=1, features=features, strides=strides, kernel_size=kernel_size, nclasses=2) #change to U-Net for fair comparaison
