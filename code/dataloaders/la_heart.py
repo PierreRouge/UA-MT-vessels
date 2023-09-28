@@ -5,6 +5,7 @@ from glob import glob
 from torch.utils.data import Dataset
 import h5py
 import itertools
+import nibabel as nib
 from torch.utils.data.sampler import Sampler
 
 from torchvision import transforms
@@ -226,6 +227,12 @@ if __name__ == '__main__':
     
     for batch, data in enumerate(trainloader):
         label = data['label']
+        image_name = data['image_name']
+        
+        path = '../../gt/' + image_name[0] + '.nii.gz'
+        img = nib.Nifti1Image(label[0].numpy().astype(float), affine=np.eye(4))
+        nib.save(img, path)
+        
         print(label.shape)
         print('Sum')
         print(torch.sum(label))

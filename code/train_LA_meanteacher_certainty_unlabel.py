@@ -24,7 +24,7 @@ from utils import ramps, losses
 from dataloaders.la_heart import LAHeart, RandomCrop, CenterCrop, RandomRotFlip, ToTensor, TwoStreamBatchSampler
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--root_path', type=str, default='../data/2018LA_Seg_Training Set', help='Name of Experiment')
+parser.add_argument('--root_path', type=str, default='../data/IXI_Bullitt_training_set/', help='Name of Experiment')
 parser.add_argument('--exp', type=str,  default='UAMT_unlabel', help='model_name')
 parser.add_argument('--max_iterations', type=int,  default=6000, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int, default=4, help='batch_size per gpu')
@@ -115,8 +115,8 @@ if __name__ == "__main__":
                            ToTensor()
                        ]))
     
-    labeled_idxs = list(range(42))
-    unlabeled_idxs = list(range(42, 76))
+    labeled_idxs = list(range(34))
+    unlabeled_idxs = list(range(34, 350))
     batch_sampler = TwoStreamBatchSampler(labeled_idxs, unlabeled_idxs, batch_size, batch_size-labeled_bs)
     def worker_init_fn(worker_id):
         random.seed(args.seed+worker_id)
