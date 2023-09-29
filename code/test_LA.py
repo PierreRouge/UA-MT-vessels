@@ -20,7 +20,7 @@ num_classes = 2
 
 with open(FLAGS.root_path + 'test.list', 'r') as f:
     image_list = f.readlines()
-image_list = [FLAGS.root_path + '2018LA_Seg_Training Set/' + item.replace('\n', '')+"/mra_norm.h5" for item in image_list]
+image_list = [FLAGS.root_path + 'IXI_Bullitt_training_set/' + item.replace('\n', '')+"/mra_norm.h5" for item in image_list]
 
 
 def test_calculate_metric(epoch_num):
