@@ -25,12 +25,15 @@ from dataloaders.la_heart import LAHeart, RandomCrop, CenterCrop, RandomRotFlip,
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root_path', type=str, default='../data/IXI_Bullitt_training_set/', help='Name of Experiment')
+parser.add_argument('--dataset', type=str,  default='Bullitt', help='Dataset to use')
 parser.add_argument('--exp', type=str,  default='UAMT_unlabel', help='model_name')
 parser.add_argument('--max_iterations', type=int,  default=6000, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int, default=4, help='batch_size per gpu')
 parser.add_argument('--labeled_bs', type=int, default=2, help='labeled_batch_size per gpu')
 parser.add_argument('--base_lr', type=float,  default=0.01, help='maximum epoch number to train')
 parser.add_argument('--deterministic', type=int,  default=1, help='whether use deterministic training')
+parser.add_argument('--labelnum', type=int,  default=34, help='Number of labeled samples')
+parser.add_argument('--maxsamples', type=int,  default=350, help='Number of total samples')
 parser.add_argument('--seed', type=int,  default=1337, help='random seed')
 parser.add_argument('--gpu', type=str,  default='0', help='GPU to use')
 ### costs
@@ -59,7 +62,7 @@ if args.deterministic:
     torch.cuda.manual_seed(args.seed)
 
 num_classes = 2
-patch_size = (128, 128, 96)
+patch_size = tuple(args.patch_size)
 
 
 def get_current_consistency_weight(epoch):
@@ -115,8 +118,8 @@ if __name__ == "__main__":
                            ToTensor()
                        ]))
     
-    labeled_idxs = list(range(34))
-    unlabeled_idxs = list(range(34, 350))
+    labeled_idxs = list(range(args.labelnum))
+    unlabeled_idxs = list(range(args.labelnum, args.maxsamples))
     batch_sampler = TwoStreamBatchSampler(labeled_idxs, unlabeled_idxs, batch_size, batch_size-labeled_bs)
     def worker_init_fn(worker_id):
         random.seed(args.seed+worker_id)
@@ -159,13 +162,13 @@ if __name__ == "__main__":
             T = 8
             volume_batch_r = unlabeled_volume_batch.repeat(2, 1, 1, 1, 1)
             stride = volume_batch_r.shape[0] // 2
-            preds = torch.zeros([stride * T, 2, 128, 128, 96]).cuda()
+            preds = torch.zeros([stride * T, 2, patch_size[0], patch_size[1], patch_size[2]]).cuda()
             for i in range(T//2):
                 ema_inputs = volume_batch_r + torch.clamp(torch.randn_like(volume_batch_r) * 0.1, -0.2, 0.2)
                 with torch.no_grad():
                     preds[2 * stride * i:2 * stride * (i + 1)] = ema_model(ema_inputs)
             preds = F.softmax(preds, dim=1)
-            preds = preds.reshape(T, stride, 2, 128, 128, 96)
+            preds = preds.reshape(T, stride, 2, patch_size[0], patch_size[1], patch_size[2])
             preds = torch.mean(preds, dim=0)  #(batch, 2, 112,112,80)
             uncertainty = -1.0*torch.sum(preds*torch.log(preds + 1e-6), dim=1, keepdim=True) #(batch, 1, 112,112,80)
 

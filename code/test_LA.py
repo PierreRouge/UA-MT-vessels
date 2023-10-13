@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--root_path', type=str, default='../data/', help='Name of Experiment')
 parser.add_argument('--model', type=str,  default='UA-MT-2', help='model_name')
 parser.add_argument('--gpu', type=str,  default='0', help='GPU to use')
+parser.add_argument('--patch_size', nargs='+', type=int, default=[128, 128, 128], help='Patch _size')
 FLAGS = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.gpu
@@ -34,7 +35,7 @@ def test_calculate_metric(epoch_num):
     net.eval()
 
     avg_metric = test_all_case(net, image_list, num_classes=num_classes,
-                               patch_size=(128, 128, 96),
+                               patch_size=tuple(FLAGS.patch_size),
                                save_result=True, test_save_path=test_save_path)
 
     return avg_metric
