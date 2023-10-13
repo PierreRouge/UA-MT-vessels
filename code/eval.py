@@ -23,7 +23,7 @@ parser.add_argument('--postprocessing', type=bool,  default=True, help='prostpro
 
 args = parser.parse_args()
 
-dir_inputs = args.dir_inputs
+dir_inputs = args.dir_inputs +'/*_pred.nii.gz'
 postprocessing = args.postprocessing
 
 # Metrics
