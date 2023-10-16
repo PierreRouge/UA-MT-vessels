@@ -26,6 +26,16 @@ def covert_h5():
         f.create_dataset('image', data=image, compression="gzip")
         f.create_dataset('label', data=label, compression="gzip")
         f.close()
+        
+def read_h5():
+    listt =  glob('../../../../Thèse_Rougé_Pierre/Data/Bullit/raw/dataset/*/*.h5')
+    
+    for item in tqdm(listt):
+        print(item)
+        h5f = h5py.File(item, 'r')
+        print(h5f['label'])
+        
 
 if __name__ == '__main__':
-    covert_h5()
+    # covert_h5()
+    read_h5()

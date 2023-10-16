@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from glob import glob
 from tqdm import tqdm
@@ -23,7 +24,8 @@ def covert_h5():
         image = (image - np.mean(image)) / np.std(image)
         image = image.astype(np.float32)
 
-        item = item.replace('GT', 'dataset')
+        item = item.replace('GT', 'dataset2')
+        os.makedirs(item.replace('.nii.gz', '/'))
         f = h5py.File(item.replace('.nii.gz', '/mra_norm.h5'), 'w')
         f.create_dataset('image', data=image, compression="gzip")
         f.create_dataset('label', data=label, compression="gzip")
