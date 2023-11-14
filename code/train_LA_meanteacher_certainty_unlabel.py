@@ -24,17 +24,17 @@ from utils import ramps, losses
 from dataloaders.la_heart import LAHeart, RandomCrop, CenterCrop, RandomRotFlip, ToTensor, TwoStreamBatchSampler
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--root_path', type=str, default='../data/IXI_Bullitt_training_set/', help='Name of Experiment')
+parser.add_argument('--root_path', type=str, default='../../data/Bullitt_training_set/Patients', help='Name of Experiment')
 parser.add_argument('--dataset', type=str,  default='Bullitt', help='Dataset to use')
 parser.add_argument('--exp', type=str,  default='UAMT_unlabel', help='model_name')
 parser.add_argument('--max_iterations', type=int,  default=6000, help='maximum epoch number to train')
-parser.add_argument('--batch_size', type=int, default=4, help='batch_size per gpu')
-parser.add_argument('--labeled_bs', type=int, default=2, help='labeled_batch_size per gpu')
+parser.add_argument('--batch_size', type=int, default=2, help='batch_size per gpu')
+parser.add_argument('--labeled_bs', type=int, default=1, help='labeled_batch_size per gpu')
 parser.add_argument('--base_lr', type=float,  default=0.01, help='maximum epoch number to train')
 parser.add_argument('--deterministic', type=int,  default=1, help='whether use deterministic training')
-parser.add_argument('--labelnum', type=int,  default=34, help='Number of labeled samples')
-parser.add_argument('--maxsamples', type=int,  default=350, help='Number of total samples')
-parser.add_argument('--patch_size', nargs='+', type=int, default=[128, 128, 128], help='Patch _size')
+parser.add_argument('--labelnum', type=int,  default=5, help='Number of labeled samples')
+parser.add_argument('--maxsamples', type=int,  default=94, help='Number of total samples')
+parser.add_argument('--patch_size', nargs='+', type=int, default=[64, 64, 64], help='Patch _size')
 parser.add_argument('--seed', type=int,  default=1337, help='random seed')
 parser.add_argument('--gpu', type=str,  default='0', help='GPU to use')
 ### costs
@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     writer = SummaryWriter(snapshot_path+'/log')
     logging.info("{} itertations per epoch".format(len(trainloader)))
-
+    
     iter_num = 0
     max_epoch = max_iterations//len(trainloader)+1
     lr_ = base_lr
@@ -152,6 +152,8 @@ if __name__ == "__main__":
             time2 = time.time()
             # print('fetch data cost {}'.format(time2-time1))
             volume_batch, label_batch = sampled_batch['image'], sampled_batch['label']
+            print(volume_batch.shape)
+            print(label_batch.shape)
             volume_batch, label_batch = volume_batch.cuda(), label_batch.cuda()
             unlabeled_volume_batch = volume_batch[labeled_bs:]
 
