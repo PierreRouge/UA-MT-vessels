@@ -183,10 +183,11 @@ if __name__ == "__main__":
             supervised_loss = 0.5*(loss_seg+loss_seg_dice)
 
             consistency_weight = get_current_consistency_weight(iter_num//21) #21 because there are 21 iterations per epoch
-            consistency_dist = consistency_criterion(outputs[labeled_bs:], ema_output) #(batch, 2, 112,112,80)
+            
             threshold = (0.75+0.25*ramps.sigmoid_rampup(iter_num, max_iterations))*np.log(2)
             mask = (uncertainty<threshold).float()
-            consistency_dist = torch.sum(mask*consistency_dist)/(2*torch.sum(mask)+1e-16)
+            consistency_dist = consistency_criterion(mask*outputs[labeled_bs:], mask*ema_output) #(batch, 2, 112,112,80)
+            # consistency_dist = torch.sum(mask*consistency_dist)/(2*torch.sum(mask)+1e-16)
             consistency_loss = consistency_weight * consistency_dist
             loss = supervised_loss + consistency_loss
 
