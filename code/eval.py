@@ -16,7 +16,7 @@ import nibabel as nib
 
 from skimage.morphology import skeletonize
 from skimage.morphology import remove_small_objects
-from skimage.measure import label, euler_number
+from skimage.measure import label
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dir_inputs', type=str, default='../../../Thèse_Rougé_Pierre/res_semi_supervised/UA-MT/UA-MT-Bullitt_18_labeled_post', help='Path')
@@ -90,10 +90,8 @@ def sensitivity_specificity_precision(y_true, y_pred):
     
     return sens, spec, prec
 
-def euler_number_numpy(y):
-    return euler_number(y)
 
-def euler_number_numpy_v2(y):
+def euler_number_numpy(y):
     shape_ = y.shape
     new_shape = (shape_[0] * 2 + 1, shape_[1] * 2 + 1, shape_[2] * 2 + 1)
     CW = np.zeros(new_shape)
@@ -125,11 +123,11 @@ def euler_number_numpy_v2(y):
                     f1 += CW[i, j, k]
     euler = f0 - f1 + f2 -f3
         
-    return euler, f0, f1, f2, f3
+    return euler
 
 def euler_number_error_numpy(y_true, y_pred, method='difference'):
-    euler_number_true = euler_number(y_true)
-    euler_number_pred = euler_number(y_pred)
+    euler_number_true = euler_number_numpy(y_true)
+    euler_number_pred = euler_number_numpy(y_pred)
     
     if method == 'difference' :
         euler_number_error = np.absolute(euler_number_true - euler_number_pred)
