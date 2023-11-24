@@ -270,9 +270,9 @@ dict_csv = {'Patient': "Mean",
             'Precision': np.mean(prec_list),
             'Sensitivity': np.mean(sens_list),
             "Euler Number error": np.mean(euler_number_list),
-            "B0 error": np.mean(b0_error),
-            "B1 error": np.mean(b1_error),
-            "B2 error": np.mean(b2_error),
+            "B0 error": np.mean(b0_list),
+            "B1 error": np.mean(b1_list),
+            "B2 error": np.mean(b2_list),
             }
 
 writer.writerow(dict_csv)
@@ -283,9 +283,9 @@ dict_csv = {'Patient': "Std",
             'Precision': np.std(prec_list),
             'Sensitivity': np.std(sens_list),
             "Euler Number error": np.std(euler_number_list),
-            "B0 error": np.std(b0_error),
-            "B1 error": np.std(b1_error),
-            "B2 error": np.std(b2_error),}
+            "B0 error": np.std(b0_list),
+            "B1 error": np.std(b1_list),
+            "B2 error": np.std(b2_list),}
 
 writer.writerow(dict_csv)
    
