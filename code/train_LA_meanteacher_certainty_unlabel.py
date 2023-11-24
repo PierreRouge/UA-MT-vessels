@@ -42,6 +42,8 @@ parser.add_argument('--ema_decay', type=float,  default=0.99, help='ema_decay')
 parser.add_argument('--consistency_type', type=str,  default="dice", help='consistency_type')
 parser.add_argument('--consistency', type=float,  default=0.1, help='consistency')
 parser.add_argument('--consistency_rampup', type=float,  default=40.0, help='consistency_rampup')
+parser.add_argument('--consistency_rampup', type=int,  default=40.0, help='consistency_rampup')
+
 args = parser.parse_args()
 
 train_data_path = args.root_path
@@ -182,7 +184,7 @@ if __name__ == "__main__":
             loss_seg_dice = losses.dice_loss(outputs_soft[:labeled_bs, 1, :, :, :], label_batch[:labeled_bs] == 1)
             supervised_loss = 0.5*(loss_seg+loss_seg_dice)
 
-            consistency_weight = get_current_consistency_weight(iter_num//21) #21 because there are 21 iterations per epoch
+            consistency_weight = get_current_consistency_weight(iter_num//args.niter_epoch) #21 because there are 21 iterations per epoch
             
             threshold = (0.75+0.25*ramps.sigmoid_rampup(iter_num, max_iterations))*np.log(2)
             mask = (uncertainty<threshold).float()
