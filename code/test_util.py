@@ -14,8 +14,6 @@ def test_all_case(net, image_list, num_classes, patch_size=(112, 112, 80), strid
         h5f = h5py.File(image_path, 'r')
         image = h5f['image'][:]
         label = h5f['label'][:]
-        print(label)
-        print(np.sum(label))
         if preproc_fn is not None:
             image = preproc_fn(image)
         prediction, score_map = test_single_case(net, image, stride_xy, stride_z, patch_size, num_classes=num_classes)
