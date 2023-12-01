@@ -46,7 +46,6 @@ parser.add_argument('--ema_decay', type=float,  default=0.99, help='ema_decay')
 parser.add_argument('--consistency_type', type=str,  default="dice", help='consistency_type')
 parser.add_argument('--consistency', type=float,  default=0.1, help='consistency')
 parser.add_argument('--consistency_rampup', type=float,  default=40.0, help='consistency_rampup')
-parser.add_argument('--niter_epoch', type=int,  default=150, help='consistency_rampup')
 args = parser.parse_args()
 
 train_data_path = args.root_path
