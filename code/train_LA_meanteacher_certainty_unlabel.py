@@ -9,6 +9,8 @@ import time
 import random
 import numpy as np
 
+from sklearn.model_selection import train_test_split
+
 import torch
 import torch.optim as optim
 from torchvision import transforms
@@ -34,6 +36,8 @@ parser.add_argument('--base_lr', type=float,  default=0.01, help='maximum epoch 
 parser.add_argument('--deterministic', type=int,  default=1, help='whether use deterministic training')
 parser.add_argument('--labelnum', type=int,  default=5, help='Number of labeled samples')
 parser.add_argument('--maxsamples', type=int,  default=94, help='Number of total samples')
+parser.add_argument('--random_state', type=int,  default=1, help='Random state for data splitting')
+parser.add_argument('--niter_epoch', type=int,  default=150, help='Number of iterations defining an epoch (for sigmoid rampup)')
 parser.add_argument('--patch_size', nargs='+', type=int, default=[64, 64, 64], help='Patch _size')
 parser.add_argument('--seed', type=int,  default=1337, help='random seed')
 parser.add_argument('--gpu', type=str,  default='0', help='GPU to use')
@@ -42,7 +46,7 @@ parser.add_argument('--ema_decay', type=float,  default=0.99, help='ema_decay')
 parser.add_argument('--consistency_type', type=str,  default="dice", help='consistency_type')
 parser.add_argument('--consistency', type=float,  default=0.1, help='consistency')
 parser.add_argument('--consistency_rampup', type=float,  default=40.0, help='consistency_rampup')
-
+parser.add_argument('--niter_epoch', type=int,  default=150, help='consistency_rampup')
 args = parser.parse_args()
 
 train_data_path = args.root_path
@@ -120,8 +124,9 @@ if __name__ == "__main__":
                            ToTensor()
                        ]))
     
-    labeled_idxs = list(range(args.labelnum))
-    unlabeled_idxs = list(range(args.labelnum, args.maxsamples))
+    idxs = np.arange(0, args.maxsamples)
+    labeled_idxs, unlabeled_idxs = train_test_split(idxs, train_size=args.labelnum, random_state=args.random_state)
+    
     batch_sampler = TwoStreamBatchSampler(labeled_idxs, unlabeled_idxs, batch_size, batch_size-labeled_bs)
     def worker_init_fn(worker_id):
         random.seed(args.seed+worker_id)
@@ -153,8 +158,6 @@ if __name__ == "__main__":
             time2 = time.time()
             # print('fetch data cost {}'.format(time2-time1))
             volume_batch, label_batch = sampled_batch['image'], sampled_batch['label']
-            print(volume_batch.shape)
-            print(label_batch.shape)
             volume_batch, label_batch = volume_batch.cuda(), label_batch.cuda()
             unlabeled_volume_batch = volume_batch[labeled_bs:]
 
