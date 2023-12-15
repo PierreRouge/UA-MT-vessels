@@ -69,9 +69,6 @@ class CenterCrop(object):
 
         label = label[w1:w1 + self.output_size[0], h1:h1 + self.output_size[1], d1:d1 + self.output_size[2]]
         image = image[w1:w1 + self.output_size[0], h1:h1 + self.output_size[1], d1:d1 + self.output_size[2]]
-        
-        print("sum label in CenterCrop")
-        print(np.sum(label))
 
         return {'image': image, 'label': label}
 
