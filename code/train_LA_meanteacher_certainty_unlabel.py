@@ -176,10 +176,12 @@ if __name__ == "__main__":
             print(volume_batch.shape)
             print(label_batch.shape)
             
+            print(sampled_batch['image_name'][0])
             print("Sum volume")
             print(torch.sum(volume_batch[0]))
             print("Sum label")
             print(torch.sum(label_batch[0]))
+        
             
 
             noise = torch.clamp(torch.randn_like(unlabeled_volume_batch) * 0.1, -0.2, 0.2)
