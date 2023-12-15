@@ -37,6 +37,8 @@ class LAHeart(Dataset):
         h5f = h5py.File(self._base_dir+"/"+image_name+"/data.h5", 'r')
         image = h5f['image'][:]
         label = h5f['label'][:]
+        print("sum label in getitem")
+        print(torch.sum(label))
         sample = {'image': image, 'label': label, 'image_name': image_name}
         if self.transform:
             sample = self.transform(sample)
@@ -67,6 +69,9 @@ class CenterCrop(object):
 
         label = label[w1:w1 + self.output_size[0], h1:h1 + self.output_size[1], d1:d1 + self.output_size[2]]
         image = image[w1:w1 + self.output_size[0], h1:h1 + self.output_size[1], d1:d1 + self.output_size[2]]
+        
+        print("sum label in CenterCrop")
+        print(torch.sum(label))
 
         return {'image': image, 'label': label}
 
@@ -104,6 +109,10 @@ class RandomCrop(object):
 
         label = label[w1:w1 + self.output_size[0], h1:h1 + self.output_size[1], d1:d1 + self.output_size[2]]
         image = image[w1:w1 + self.output_size[0], h1:h1 + self.output_size[1], d1:d1 + self.output_size[2]]
+        
+        print("sum label in RandomCrop")
+        print(torch.sum(label))
+        
         return {'image': image, 'label': label}
 
 
@@ -122,6 +131,9 @@ class RandomRotFlip(object):
         axis = np.random.randint(0, 2)
         image = np.flip(image, axis=axis).copy()
         label = np.flip(label, axis=axis).copy()
+        
+        print("sum label in RandomRotFlip")
+        print(torch.sum(label))
 
         return {'image': image, 'label': label}
 
@@ -161,6 +173,8 @@ class ToTensor(object):
             return {'image': torch.from_numpy(image), 'label': torch.from_numpy(sample['label']).long(),
                     'onehot_label': torch.from_numpy(sample['onehot_label']).long()}
         else:
+            print("sum label in CenterCrop")
+            print(torch.sum(torch.from_numpy(sample['label']).long()))
             return {'image': torch.from_numpy(image), 'label': torch.from_numpy(sample['label']).long()}
 
 
