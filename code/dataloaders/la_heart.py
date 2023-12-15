@@ -170,8 +170,8 @@ class ToTensor(object):
             return {'image': torch.from_numpy(image), 'label': torch.from_numpy(sample['label']).long(),
                     'onehot_label': torch.from_numpy(sample['onehot_label']).long()}
         else:
-            print("sum label in CenterCrop")
-            print(np.sum(torch.from_numpy(sample['label']).long()))
+            print("sum label in ToTensro")
+            print(torch.sum(torch.from_numpy(sample['label']).long()))
             return {'image': torch.from_numpy(image), 'label': torch.from_numpy(sample['label']).long()}
 
 
