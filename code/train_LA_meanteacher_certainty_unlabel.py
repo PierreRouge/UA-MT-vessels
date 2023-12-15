@@ -135,6 +135,9 @@ if __name__ == "__main__":
     else:
         labeled_idxs = list(range(args.labelnum))
         unlabeled_idxs = list(range(args.labelnum, args.maxsamples))
+        
+    print(labeled_idxs)
+    print(unlabeled_idxs)
     
     batch_sampler = TwoStreamBatchSampler(labeled_idxs, unlabeled_idxs, batch_size, batch_size-labeled_bs)
     def worker_init_fn(worker_id):
