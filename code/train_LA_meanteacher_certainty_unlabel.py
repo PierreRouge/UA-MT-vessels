@@ -111,13 +111,16 @@ if __name__ == "__main__":
     model = create_model()
     ema_model = create_model(ema=True)
 
+    # db_train = LAHeart(base_dir=train_data_path,
+    #                    split='train',
+    #                    transform = transforms.Compose([
+    #                       RandomRotFlip(),
+    #                       RandomCrop(patch_size),
+    #                       ToTensor(),
+    #                       ]))
     db_train = LAHeart(base_dir=train_data_path,
                        split='train',
-                       transform = transforms.Compose([
-                          RandomRotFlip(),
-                          RandomCrop(patch_size),
-                          ToTensor(),
-                          ]))
+                       transform = None)
     db_test = LAHeart(base_dir=train_data_path,
                        split='test',
                        transform = transforms.Compose([
