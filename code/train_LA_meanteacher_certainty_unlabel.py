@@ -26,7 +26,7 @@ from utils import ramps, losses
 from dataloaders.la_heart import LAHeart, RandomCrop, CenterCrop, RandomRotFlip, ToTensor, TwoStreamBatchSampler
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--root_path', type=str, default='../../data/Bullitt_training_set/Patients', help='Name of Experiment')
+parser.add_argument('--root_path', type=str, default='../../data/Bullitt_dilatation_1_training_set/Patients', help='Name of Experiment')
 parser.add_argument('--dataset', type=str,  default='Bullitt', help='Dataset to use')
 parser.add_argument('--exp', type=str,  default='UAMT_unlabel', help='model_name')
 parser.add_argument('--max_iterations', type=int,  default=6000, help='maximum epoch number to train')
@@ -169,6 +169,15 @@ if __name__ == "__main__":
             volume_batch, label_batch = sampled_batch['image'], sampled_batch['label']
             volume_batch, label_batch = volume_batch.cuda(), label_batch.cuda()
             unlabeled_volume_batch = volume_batch[labeled_bs:]
+            
+            print(volume_batch.shape)
+            print(label_batch.shape)
+            
+            print("Sum volume")
+            print(torch.sum(volume_batch[0]))
+            print("Sum label")
+            print(torch.sum(label_batch[0]))
+            
 
             noise = torch.clamp(torch.randn_like(unlabeled_volume_batch) * 0.1, -0.2, 0.2)
             ema_inputs = unlabeled_volume_batch + noise
@@ -189,9 +198,16 @@ if __name__ == "__main__":
             uncertainty = -1.0*torch.sum(preds*torch.log(preds + 1e-6), dim=1, keepdim=True) #(batch, 1, 112,112,80)
 
 
+            print("Outputs sum")
+            print(torch.sum(outputs[0]))
+           
             ## calculate the loss
             loss_seg = F.cross_entropy(outputs[:labeled_bs], label_batch[:labeled_bs])
             outputs_soft = F.softmax(outputs, dim=1)
+            
+            print(outputs_soft[0, :, 32, 32, 32])
+            print(label_batch[0, 32, 32, 32])
+            
             loss_seg_dice = losses.dice_loss(outputs_soft[:labeled_bs, 1, :, :, :], label_batch[:labeled_bs] == 1)
             supervised_loss = 0.5*(loss_seg+loss_seg_dice)
 
