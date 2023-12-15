@@ -172,7 +172,7 @@ class ToTensor(object):
         else:
             print("sum label in ToTensro")
             print(torch.sum(torch.from_numpy(sample['label']).long()))
-            return {'image': torch.from_numpy(image), 'label': torch.from_numpy(sample['label']).long()}
+            return {'image': torch.from_numpy(image), 'label': torch.from_numpy(sample['label']).round().long()}
 
 
 class TwoStreamBatchSampler(Sampler):
