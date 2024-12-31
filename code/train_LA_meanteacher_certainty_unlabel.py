@@ -141,6 +141,7 @@ if __name__ == "__main__":
     def worker_init_fn(worker_id):
         random.seed(args.seed+worker_id)
     trainloader = DataLoader(db_train, batch_sampler=batch_sampler, num_workers=4, pin_memory=True, worker_init_fn=worker_init_fn)
+    testloader = DataLoader(db_test, batch_size=2, num_workers=4)
 
     model.train()
     ema_model.train()
@@ -224,9 +225,23 @@ if __name__ == "__main__":
             writer.add_scalar('train/consistency_loss', consistency_loss, iter_num)
             writer.add_scalar('train/consistency_weight', consistency_weight, iter_num)
             writer.add_scalar('train/consistency_dist', consistency_dist, iter_num)
+            
+            for i_val, sampled_val in next(testloader):
+                
+                volume_val, label_val = sampled_val['image'], sampled_val['label']
+                volume_val, label_val = volume_val.cuda(), label_val.cuda()
+                
+                with torch.no_grad():
+                    output_val = model(volume_val)
+                    
+                ## calculate the loss
+                output_soft_val = F.softmax(output_val, dim=1)
+                
+                dice_val = losses.dice_loss(output_soft_val[:, 1, :, :, :], label_val[:] == 1)
 
-            logging.info('iteration %d : loss : %f cons_dist: %f, loss_weight: %f' %
-                          (iter_num, loss.item(), consistency_dist.item(), consistency_weight))
+                logging.info('iteration %d : loss : %f cons_dist: %f, loss_weight: %f, dice_train: %f, dice_val: %f' 
+                             % (iter_num, loss.item(), consistency_dist.item(), consistency_weight, loss_seg_dice, dice_val))
+            
             if iter_num % 50 == 0:
                 image = volume_batch[0, 0:1, :, :, 20:61:10].permute(3, 0, 1, 2).repeat(1, 3, 1, 1)
                 grid_image = make_grid(image, 5, normalize=True)
@@ -278,6 +293,7 @@ if __name__ == "__main__":
             if iter_num >= max_iterations:
                 break
             time1 = time.time()
+            
         if iter_num >= max_iterations:
             break
     save_mode_path = os.path.join(snapshot_path, 'iter_'+str(max_iterations)+'.pth')
